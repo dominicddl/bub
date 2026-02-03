@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
+import pool from "./config/database";
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
@@ -20,6 +21,16 @@ app.get("/health", (req: Request, res: Response) => {
 // root route
 app.get("/", (req: Request, res: Response) => {
     res.status(200).json({ message: "Welcome to Bub API" });
+});
+
+// database routes
+app.get("/health/db", async (req: Request, res: Response) => {
+    try {
+        const result = await pool.query("SELECT NOW()");
+        res.status(200).json({ message: "Database is running", data: result.rows[0] });
+    } catch (error) {
+        res.status(500).json({ message: "Error testing database connection", error: error });
+    }
 });
 
 // start server
